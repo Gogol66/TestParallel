@@ -14,11 +14,18 @@ namespace TestParallel
             Task t1 = Task.Run(() => Show());
             Task t2 = Task.Run(() => Print());
             Task.WaitAll(t1, t2);
-            for (int i = 0; i < 20; i++)
-                ThreadPool.QueueUserWorkItem(WorkItem, i);
+            var number = Enumerable.Range(1, 10);
+            Parallel.For(1, 10, i =>
+             {
+                 Console.WriteLine($"Task {i} running on thread {Thread.CurrentThread.ManagedThreadId}");
+             });
+            Parallel.ForEach(number, i =>
+            {
+                Console.WriteLine($"Task {i} running on thread {Thread.CurrentThread.ManagedThreadId}");
+            });
             Console.ReadKey();
         }
-        static async void Show()
+        static async Task Show()
         {
             await Task.Delay(100);
             Console.WriteLine($"Show function");
@@ -27,10 +34,6 @@ namespace TestParallel
         {
             await Task.Delay(100);
             Console.WriteLine($"Print function");
-        }
-        static void WorkItem(object state)
-        {
-            Console.WriteLine($"Task {state} running on thread {Thread.CurrentThread.ManagedThreadId}");
         }
     }
 }
